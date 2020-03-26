@@ -5,6 +5,8 @@ const cors = require('cors')
 const { verify } = require('jsonwebtoken')
 const { hash, compare } = require('bcryptjs')
 
+const { fakeDB } = require('./fakeDB')
+
 const app = express()
 
 app.use(cookieParser())
@@ -35,10 +37,14 @@ app.post('/register', async (req, res) => {
     })
     res.send({ message: 'User Created' })
     console.log(fakeDB)
-  } catch (err => {
+  } catch (err) {
       console.error(err);
       res.status(500).json({ error: err.code });
-  })
+  }
 })
 
 // Login
+
+app.listen(process.env.PORT, () => {
+  console.log(`Server listening on port ${process.env.PORT}`)
+})
