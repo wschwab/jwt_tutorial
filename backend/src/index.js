@@ -13,6 +13,7 @@ const {
 } = require('./tokens')
 
 const { fakeDB } = require('./fakeDB')
+const { isAuth } = require('./isAuth')
 
 const app = express()
 
@@ -71,11 +72,21 @@ app.post('/login', async (req, res) => {
 })
 
 app.post('/logout', async (req, res) => {
-
+  res.clearCookie('refreshtoken')
+  return res.status(200).json({ body: "Successful logout"})
 })
 
 app.post('/protected', async (req, res) => {
-
+  try {
+      const userId = isAuth(req)
+      if (userId !== null) {
+        res.send({
+          data: 'This is the protected data'
+        })
+      }
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
 })
 
 app.post('/refresh_token', (req, res) => {
