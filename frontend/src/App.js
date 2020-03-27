@@ -1,11 +1,11 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { Router, navigate } from '@reach/router'
 
-import Navigation from './Navigation'
-import Login from './Login'
-import Register from './Register'
-import Protected from './Protected'
-import Content from './Content'
+import Navigation from './components/Navigation'
+import Login from './components/Login'
+import Register from './components/Register'
+import Protected from './components/Protected'
+import Content from './components/Content'
 
 export const UserContext = createContext([])
 
@@ -14,12 +14,33 @@ function App() {
   const [loading, setLoading] = useState(true)
 
   const logoutCallback = async () => {
-
+    await fetch('http://localhost:4000/logout', {
+      method: 'POST',
+      credentials: 'include'
+    })
+    setUser({})
+    navigate('/')
   }
 
   useEffect(() => {
+    async function checkRefreshToken() {
+      const result = await (await fetch('http://localhost:4000/refresh_token', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })).json()
 
+      setUser({
+        accesstoken: result.accesstoken
+      })
+      setLoading(false)
+    }
+    checkRefreshToken()
   }, [])
+
+  if (loading) return <div>Loading...</div>
 
   return (
     <UserContext.Provider value={[user, setUser]}>
